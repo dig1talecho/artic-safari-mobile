@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Arctic Safari Driver",
+    "slug": "arctic-safari-driver",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#050811",
+    "splash": {
+      "backgroundColor": "#050811"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.arcticsafari.driver"
+    },
+    "android": {
+      "package": "com.arcticsafari.driver"
+    }
+  }
+}
