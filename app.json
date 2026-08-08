@@ -1,21 +1,41 @@
 {
   "expo": {
-    "name": "Arctic Safari Driver",
-    "slug": "arctic-safari-driver",
+    "name": "Artic Safari",
+    "slug": "artic-safari-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#050811",
     "splash": {
-      "backgroundColor": "#050811"
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#040609"
     },
-    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.arcticsafari.driver"
+      "supportsTablet": true
     },
     "android": {
-      "package": "com.arcticsafari.driver"
-    }
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "enableHermes": false
+          },
+          "android": {
+            "enableHermes": false
+          }
+        }
+      ]
+    ]
   }
 }
