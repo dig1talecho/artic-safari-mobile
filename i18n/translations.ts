@@ -1,0 +1,365 @@
+// English + Norwegian (Bokmål) copy for the customer app.
+//
+// Kept as a plain typed object rather than pulling in i18next: the string
+// count is small, and typing `TranslationKey` off the English object means
+// a missing Norwegian key is a compile error, not a runtime fallback that
+// silently ships English to a Norwegian guest.
+
+export const en = {
+  common: {
+    appName: "Artic Safari",
+    loading: "Loading…",
+    retry: "Retry",
+    cancel: "Cancel",
+    back: "Back",
+    continue: "Continue",
+    close: "Close",
+    save: "Save",
+    error: "Something went wrong",
+    currency: "kr",
+  },
+
+  nav: {
+    tours: "Tours",
+    bookings: "My Bookings",
+    transfer: "Transfer",
+    rewards: "Rewards",
+    profile: "Profile",
+  },
+
+  auth: {
+    signIn: "Sign in",
+    signUp: "Create account",
+    signOut: "Sign out",
+    email: "Email",
+    password: "Password",
+    fullName: "Full name",
+    phone: "Phone number",
+    continueWithGoogle: "Continue with Google",
+    continueWithApple: "Continue with Apple",
+    orDivider: "or",
+    signedInAs: "Signed in as",
+    notConfigured: "This sign-in method is not set up yet.",
+  },
+
+  tours: {
+    title: "Tours & Transfers",
+    subtitle: "Private, chauffeured, and endlessly flexible.",
+    empty: "No tours available right now.",
+    from: "From",
+    perPerson: "per person",
+    duration: "Duration",
+    meetingPoint: "Meeting point",
+    highlights: "Route highlights",
+    included: "What's included",
+    bookThis: "Book this tour",
+  },
+
+  booking: {
+    title: "Reservation",
+    stepDateTime: "Date & time",
+    stepExtras: "Extras",
+    stepDetails: "Your details",
+    stepConfirm: "Confirm",
+    date: "Date",
+    preferredTime: "Preferred time",
+    noExtras: "No extras available for this experience yet.",
+    extrasTotal: "Extras total",
+    skip: "Skip",
+    package: "Package",
+    contact: "Contact",
+    total: "Total",
+    promoPrompt: "Have a partner promo code?",
+    promoPlaceholder: "E.G. RADISSON10",
+    apply: "Apply",
+    remove: "Remove",
+    promoInvalid: "That code isn't valid or has expired.",
+    promoApplied: "off applied",
+    confirm: "Confirm booking",
+    sending: "Sending…",
+    requestSent: "Booking request sent",
+    requestSentBody: "We'll contact you shortly to confirm your reservation.",
+    edit: "Edit",
+  },
+
+  myBookings: {
+    title: "Your bookings",
+    empty: "No bookings yet under this account.",
+    browseTours: "Browse tours",
+    totalBookings: "Total bookings",
+    upcoming: "Upcoming",
+    lifetimeSpend: "Lifetime spend",
+    today: "Today",
+    tomorrow: "Tomorrow",
+    inDays: "In {{count}} days",
+    statusPending: "Pending",
+    statusConfirmed: "Confirmed",
+    statusCancelled: "Cancelled",
+    leaveReview: "Leave a review",
+    reviewPending: "Review submitted — pending approval",
+    reviewLive: "Your review is live",
+    photos: "Photos",
+  },
+
+  tracking: {
+    title: "Live tracking",
+    driverOnWay: "Your driver is on the way",
+    driverAssigned: "Driver assigned",
+    noDriverYet: "No driver assigned yet",
+    etaMinutes: "{{count}} min away",
+    etaUnknown: "Calculating arrival…",
+    lastUpdated: "Last updated",
+    openInMaps: "Open in Maps",
+  },
+
+  transfer: {
+    title: "Request a transfer",
+    subtitle: "Enter pickup and drop-off for an instant price.",
+    pickup: "Pickup address",
+    dropoff: "Drop-off address",
+    searchPlaceholder: "Search any address in Tromsø",
+    useMyLocation: "Use my location",
+    locating: "Locating…",
+    locationDenied: "Location permission denied.",
+    calculate: "Calculate price",
+    calculating: "Calculating…",
+    distance: "Distance",
+    estimatedTime: "Est. time",
+    estimatedPrice: "Estimated price",
+    nightRate: "Night / weekend rate applied",
+    requestRide: "Request this transfer",
+    notConfigured:
+      "Instant route pricing isn't connected yet. Message us on WhatsApp and we'll send a quote.",
+    rateLimited: "Too many searches. Please wait a moment.",
+  },
+
+  rewards: {
+    title: "Reward points",
+    balance: "Your balance",
+    points: "points",
+    lifetimeEarned: "Earned",
+    lifetimeSpent: "Spent",
+    history: "History",
+    emptyHistory: "No points activity yet.",
+    earnedOn: "Earned",
+    redeemedOn: "Redeemed",
+    adjustment: "Adjustment",
+    expired: "Expired",
+    youWillEarn: "You'll earn ~{{count}} points",
+    redeemTitle: "Use your points",
+    redeemPlaceholder: "Points to use",
+    redeemApply: "Apply points",
+    redeemMin: "Minimum {{count}} points to redeem",
+    redeemMax: "You can use up to {{count}} points on this booking",
+    redeemApplied: "{{points}} points applied (−{{discount}} kr)",
+    howItWorks: "Earn points on every confirmed booking, then use them for a discount.",
+  },
+
+  payment: {
+    title: "Payment",
+    notConnected: "Online payment isn't available yet.",
+    notConnectedBody:
+      "Your booking will be recorded as a request and confirmed with you directly over WhatsApp.",
+    payWithVipps: "Pay with Vipps",
+    payWithCard: "Pay with card",
+    requestInstead: "Send booking request",
+  },
+
+  settings: {
+    title: "Settings",
+    language: "Language",
+    english: "English",
+    norwegian: "Norsk",
+  },
+} as const;
+
+/**
+ * Same key tree as `en`, but every leaf widened to `string`.
+ *
+ * `en` is `as const`, so its leaves are string *literals*. Checking `no`
+ * against `typeof en` directly would demand the Norwegian text equal the
+ * English text. This mapped type keeps the structural check (a missing or
+ * misspelled Norwegian key is still a compile error) while allowing any
+ * string value.
+ */
+type Shape<T> = {
+  [K in keyof T]: T[K] extends string ? string : Shape<T[K]>;
+};
+
+export const no = {
+  common: {
+    appName: "Artic Safari",
+    loading: "Laster…",
+    retry: "Prøv igjen",
+    cancel: "Avbryt",
+    back: "Tilbake",
+    continue: "Fortsett",
+    close: "Lukk",
+    save: "Lagre",
+    error: "Noe gikk galt",
+    currency: "kr",
+  },
+
+  nav: {
+    tours: "Turer",
+    bookings: "Mine bestillinger",
+    transfer: "Transport",
+    rewards: "Poeng",
+    profile: "Profil",
+  },
+
+  auth: {
+    signIn: "Logg inn",
+    signUp: "Opprett konto",
+    signOut: "Logg ut",
+    email: "E-post",
+    password: "Passord",
+    fullName: "Fullt navn",
+    phone: "Telefonnummer",
+    continueWithGoogle: "Fortsett med Google",
+    continueWithApple: "Fortsett med Apple",
+    orDivider: "eller",
+    signedInAs: "Innlogget som",
+    notConfigured: "Denne innloggingsmetoden er ikke satt opp ennå.",
+  },
+
+  tours: {
+    title: "Turer og transport",
+    subtitle: "Privat, med sjåfør, og alltid fleksibelt.",
+    empty: "Ingen turer tilgjengelig akkurat nå.",
+    from: "Fra",
+    perPerson: "per person",
+    duration: "Varighet",
+    meetingPoint: "Møtested",
+    highlights: "Høydepunkter på ruten",
+    included: "Dette er inkludert",
+    bookThis: "Bestill denne turen",
+  },
+
+  booking: {
+    title: "Reservasjon",
+    stepDateTime: "Dato og tid",
+    stepExtras: "Tillegg",
+    stepDetails: "Dine opplysninger",
+    stepConfirm: "Bekreft",
+    date: "Dato",
+    preferredTime: "Ønsket tidspunkt",
+    noExtras: "Ingen tillegg tilgjengelig for denne opplevelsen ennå.",
+    extrasTotal: "Sum tillegg",
+    skip: "Hopp over",
+    package: "Pakke",
+    contact: "Kontakt",
+    total: "Totalt",
+    promoPrompt: "Har du en partnerkode?",
+    promoPlaceholder: "F.EKS. RADISSON10",
+    apply: "Bruk",
+    remove: "Fjern",
+    promoInvalid: "Koden er ugyldig eller utløpt.",
+    promoApplied: "rabatt lagt til",
+    confirm: "Bekreft bestilling",
+    sending: "Sender…",
+    requestSent: "Bestillingsforespørsel sendt",
+    requestSentBody: "Vi kontakter deg snart for å bekrefte reservasjonen.",
+    edit: "Endre",
+  },
+
+  myBookings: {
+    title: "Dine bestillinger",
+    empty: "Ingen bestillinger registrert på denne kontoen ennå.",
+    browseTours: "Se turer",
+    totalBookings: "Bestillinger totalt",
+    upcoming: "Kommende",
+    lifetimeSpend: "Totalt brukt",
+    today: "I dag",
+    tomorrow: "I morgen",
+    inDays: "Om {{count}} dager",
+    statusPending: "Venter",
+    statusConfirmed: "Bekreftet",
+    statusCancelled: "Avlyst",
+    leaveReview: "Skriv en anmeldelse",
+    reviewPending: "Anmeldelse sendt — venter på godkjenning",
+    reviewLive: "Anmeldelsen din er publisert",
+    photos: "Bilder",
+  },
+
+  tracking: {
+    title: "Sanntidssporing",
+    driverOnWay: "Sjåføren er på vei",
+    driverAssigned: "Sjåfør tildelt",
+    noDriverYet: "Ingen sjåfør tildelt ennå",
+    etaMinutes: "{{count}} min unna",
+    etaUnknown: "Beregner ankomst…",
+    lastUpdated: "Sist oppdatert",
+    openInMaps: "Åpne i Kart",
+  },
+
+  transfer: {
+    title: "Bestill transport",
+    subtitle: "Legg inn hente- og leveringssted for pris med en gang.",
+    pickup: "Hentested",
+    dropoff: "Leveringssted",
+    searchPlaceholder: "Søk etter en adresse i Tromsø",
+    useMyLocation: "Bruk min posisjon",
+    locating: "Finner posisjon…",
+    locationDenied: "Tilgang til posisjon ble avslått.",
+    calculate: "Beregn pris",
+    calculating: "Beregner…",
+    distance: "Avstand",
+    estimatedTime: "Est. tid",
+    estimatedPrice: "Estimert pris",
+    nightRate: "Natt-/helgetillegg lagt til",
+    requestRide: "Bestill denne turen",
+    notConfigured:
+      "Direkte prisberegning er ikke koblet til ennå. Send oss en melding på WhatsApp, så sender vi et tilbud.",
+    rateLimited: "For mange søk. Vent litt.",
+  },
+
+  rewards: {
+    title: "Bonuspoeng",
+    balance: "Din saldo",
+    points: "poeng",
+    lifetimeEarned: "Opptjent",
+    lifetimeSpent: "Brukt",
+    history: "Historikk",
+    emptyHistory: "Ingen poengaktivitet ennå.",
+    earnedOn: "Opptjent",
+    redeemedOn: "Innløst",
+    adjustment: "Justering",
+    expired: "Utløpt",
+    youWillEarn: "Du tjener ca. {{count}} poeng",
+    redeemTitle: "Bruk poengene dine",
+    redeemPlaceholder: "Poeng å bruke",
+    redeemApply: "Bruk poeng",
+    redeemMin: "Minimum {{count}} poeng for å innløse",
+    redeemMax: "Du kan bruke inntil {{count}} poeng på denne bestillingen",
+    redeemApplied: "{{points}} poeng brukt (−{{discount}} kr)",
+    howItWorks: "Tjen poeng på hver bekreftet bestilling, og bruk dem som rabatt.",
+  },
+
+  payment: {
+    title: "Betaling",
+    notConnected: "Nettbetaling er ikke tilgjengelig ennå.",
+    notConnectedBody:
+      "Bestillingen registreres som en forespørsel og bekreftes direkte med deg på WhatsApp.",
+    payWithVipps: "Betal med Vipps",
+    payWithCard: "Betal med kort",
+    requestInstead: "Send bestillingsforespørsel",
+  },
+
+  settings: {
+    title: "Innstillinger",
+    language: "Språk",
+    english: "English",
+    norwegian: "Norsk",
+  },
+} satisfies Shape<typeof en>;
+
+export type Translations = Shape<typeof en>;
+export type Language = "en" | "no";
+
+export const LANGUAGES: { code: Language; label: string; flag: string }[] = [
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "no", label: "Norsk", flag: "🇳🇴" },
+];
+
+export const resources: Record<Language, Translations> = { en, no };
