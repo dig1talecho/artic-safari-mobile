@@ -223,3 +223,19 @@ export async function ensureCustomerProfile(session: Session, fallbackName?: str
     .select("full_name, phone, email")
     .single();
 }
+
+/**
+ * Sends Supabase's password-reset email.
+ *
+ * The link lands on the WEBSITE, not back in the app: a deep link into a
+ * React Native build needs a custom URL scheme registered in a development
+ * build, which this project doesn't have yet. Pointing at the site means the
+ * flow works today on every device, and the customer signs in to the app
+ * afterwards with the new password.
+ */
+export function requestPasswordReset(email: string) {
+  const site = process.env.EXPO_PUBLIC_WEB_API_URL ?? "https://www.articsafaritour.com";
+  return supabase.auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: `${site}/dashboard`,
+  });
+}

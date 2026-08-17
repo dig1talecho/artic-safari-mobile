@@ -1,27 +1,56 @@
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import {
-  Card,
-  ErrorNote,
-  Field,
-  GhostButton,
-  PrimaryButton,
-  Screen,
-} from "../components/ui";
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import * as Haptics from "expo-haptics";
+
+import FacetedBackdrop from "../components/FacetedBackdrop";
+import FoxMark from "../components/FoxMark";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useTranslation } from "../i18n";
-import { COLORS, EYEBROW, RADIUS, SPACING, TYPE } from "../constants/theme";
+import { SPACING } from "../constants/theme";
 import {
   signInWithPassword,
   signUpCustomer,
   signInWithGoogle,
   signInWithApple,
   isAppleSignInAvailable,
+  requestPasswordReset,
 } from "../services/auth";
 import { supabase } from "../lib/supabase";
 
 type Mode = "signin" | "signup";
+
+/** Solid white field with a leading glyph, matching the reference. */
+function Field({
+  label,
+  glyph,
+  ...props
+}: React.ComponentProps<typeof TextInput> & { label: string; glyph: string }) {
+  return (
+    <View style={styles.field}>
+      <Text style={styles.fieldLabel}>{label}</Text>
+      <View style={styles.inputRow}>
+        <Text style={styles.glyph}>{glyph}</Text>
+        <TextInput
+          placeholderTextColor="rgba(6,58,72,0.35)"
+          style={styles.input}
+          {...props}
+        />
+      </View>
+    </View>
+  );
+}
 
 export default function AuthScreen() {
   const { t } = useTranslation();
@@ -30,6 +59,7 @@ export default function AuthScreen() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [remember, setRemember] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [appleAvailable, setAppleAvailable] = useState(false);
@@ -38,14 +68,17 @@ export default function AuthScreen() {
     isAppleSignInAvailable().then(setAppleAvailable);
   }, []);
 
-  const handleEmailAuth = async () => {
+  const submit = async () => {
     setBusy(true);
     setError("");
 
     if (mode === "signin") {
       const { error: err } = await signInWithPassword(email.trim(), password);
       setBusy(false);
-      if (err) setError(err.message);
+      if (err) {
+        setError(err.message);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      }
       return;
     }
 
@@ -56,9 +89,6 @@ export default function AuthScreen() {
       return;
     }
 
-    // Email confirmation is disabled on this project, so signUp returns an
-    // active session and we can write the profile immediately. If it is ever
-    // re-enabled, there is no session yet — say so instead of failing silently.
     if (data.session && data.user) {
       await supabase.from("customer_profiles").insert([
         {
@@ -76,7 +106,7 @@ export default function AuthScreen() {
     setError("Check your inbox to confirm your email, then sign in.");
   };
 
-  const handleOAuth = async (provider: "google" | "apple") => {
+  const oauth = async (provider: "google" | "apple") => {
     setBusy(true);
     setError("");
     const { error: err } =
@@ -85,153 +115,357 @@ export default function AuthScreen() {
     if (err) setError(err.message);
   };
 
+  const forgotPassword = async () => {
+    if (!email.trim()) {
+      setError(t("auth.forgotNeedsEmail"));
+      return;
+    }
+    setBusy(true);
+    setError("");
+    const { error: err } = await requestPasswordReset(email.trim());
+    setBusy(false);
+    if (err) {
+      setError(err.message);
+      return;
+    }
+    Alert.alert(t("auth.forgotSentTitle"), t("auth.forgotSentBody", { email: email.trim() }));
+  };
+
   const canSubmit =
     email.trim().length > 3 &&
     password.length >= 6 &&
     (mode === "signin" || (fullName.trim().length > 0 && phone.trim().length > 0));
 
   return (
-    <Screen scroll>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <View style={styles.langRow}>
-          <LanguageSwitcher compact />
-        </View>
+    <View style={styles.root}>
+      <FacetedBackdrop />
 
-        <View style={styles.hero}>
-          <LinearGradient
-            colors={["rgba(92,225,230,0.18)", "transparent"]}
-            style={styles.heroGlow}
-          />
-          <Text style={styles.brandMark}>◇</Text>
-          <Text style={styles.brand}>{t("common.appName")}</Text>
-          <Text style={styles.tagline}>{t("tours.subtitle")}</Text>
-        </View>
-
-        <View style={styles.body}>
-          <View style={styles.tabs}>
-            {(["signin", "signup"] as Mode[]).map((m) => (
-              <Pressable
-                key={m}
-                onPress={() => {
-                  setMode(m);
-                  setError("");
-                }}
-                style={[styles.tab, mode === m && styles.tabActive]}
-              >
-                <Text style={[styles.tabText, mode === m && styles.tabTextActive]}>
-                  {m === "signin" ? t("auth.signIn") : t("auth.signUp")}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-
-          <Card style={styles.form}>
-            {mode === "signup" && (
-              <>
-                <Field
-                  label={t("auth.fullName")}
-                  value={fullName}
-                  onChangeText={setFullName}
-                  placeholder="John Doe"
-                  autoComplete="name"
-                />
-                <Field
-                  label={t("auth.phone")}
-                  value={phone}
-                  onChangeText={setPhone}
-                  placeholder="+47 000 00 000"
-                  keyboardType="phone-pad"
-                  autoComplete="tel"
-                />
-              </>
-            )}
-
-            <Field
-              label={t("auth.email")}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="john@example.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-            />
-            <Field
-              label={t("auth.password")}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="••••••••"
-              secureTextEntry
-            />
-
-            {error ? <ErrorNote message={error} /> : null}
-
-            <PrimaryButton
-              label={mode === "signin" ? t("auth.signIn") : t("auth.signUp")}
-              onPress={handleEmailAuth}
-              loading={busy}
-              disabled={!canSubmit}
-            />
-
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>{t("auth.orDivider")}</Text>
-              <View style={styles.dividerLine} />
+      <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.flex}
+        >
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.langRow}>
+              <LanguageSwitcher compact />
             </View>
 
-            <GhostButton
-              label={t("auth.continueWithGoogle")}
-              onPress={() => handleOAuth("google")}
-              disabled={busy}
-            />
-            {appleAvailable ? (
-              <GhostButton
-                label={t("auth.continueWithApple")}
-                onPress={() => handleOAuth("apple")}
-                disabled={busy}
-              />
-            ) : null}
-          </Card>
-        </View>
-      </KeyboardAvoidingView>
-    </Screen>
+            {/* Card. On a phone this fills the width rather than sitting in a
+                left column — the reference's split layout has no room here. */}
+            <View style={styles.card}>
+              <View style={styles.brandRow}>
+                <FoxMark size={58} color="#FFFFFF" />
+                <View style={styles.wordmark}>
+                  <Text style={styles.brandTop}>ARTIC</Text>
+                  <Text style={styles.brandBottom}>SAFARI</Text>
+                </View>
+              </View>
+
+              <Text style={styles.welcome}>
+                {mode === "signin" ? t("auth.welcomeBack") : t("auth.welcomeNew")}
+              </Text>
+              <Text style={styles.welcomeSub}>
+                {mode === "signin" ? t("auth.welcomeBackSub") : t("auth.welcomeNewSub")}
+              </Text>
+
+              <View style={styles.form}>
+                {mode === "signup" && (
+                  <>
+                    <Field
+                      label={t("auth.fullName")}
+                      glyph="◇"
+                      value={fullName}
+                      onChangeText={setFullName}
+                      autoComplete="name"
+                    />
+                    <Field
+                      label={t("auth.phone")}
+                      glyph="☎"
+                      value={phone}
+                      onChangeText={setPhone}
+                      keyboardType="phone-pad"
+                      autoComplete="tel"
+                    />
+                  </>
+                )}
+
+                <Field
+                  label={t("auth.email")}
+                  glyph="✉"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                />
+                <Field
+                  label={t("auth.password")}
+                  glyph="⚿"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  autoComplete="password"
+                />
+
+                {mode === "signin" && (
+                  <View style={styles.metaRow}>
+                    <Pressable
+                      onPress={() => setRemember((v) => !v)}
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: remember }}
+                      style={styles.rememberPress}
+                      hitSlop={8}
+                    >
+                      <View style={[styles.checkbox, remember && styles.checkboxOn]}>
+                        {remember ? <Text style={styles.checkboxTick}>✓</Text> : null}
+                      </View>
+                      <Text style={styles.rememberText}>{t("auth.rememberMe")}</Text>
+                    </Pressable>
+
+                    <Pressable onPress={forgotPassword} hitSlop={8}>
+                      <Text style={styles.forgot}>{t("auth.forgotPassword")}</Text>
+                    </Pressable>
+                  </View>
+                )}
+
+                {error ? (
+                  <View style={styles.errorBox}>
+                    <Text style={styles.errorText}>{error}</Text>
+                  </View>
+                ) : null}
+
+                {/* Outlined primary, as in the reference. */}
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+                    submit();
+                  }}
+                  disabled={!canSubmit || busy}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !canSubmit || busy, busy }}
+                  style={({ pressed }) => [
+                    styles.primaryBtn,
+                    pressed && styles.pressed,
+                    (!canSubmit || busy) && styles.disabled,
+                  ]}
+                >
+                  {busy ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.primaryText}>
+                      {mode === "signin" ? t("auth.signIn") : t("auth.signUp")}
+                    </Text>
+                  )}
+                </Pressable>
+
+                {/* Filled secondary — the partially visible button in the reference. */}
+                <Pressable
+                  onPress={() => {
+                    Haptics.selectionAsync().catch(() => {});
+                    setMode(mode === "signin" ? "signup" : "signin");
+                    setError("");
+                  }}
+                  accessibilityRole="button"
+                  style={({ pressed }) => [styles.secondaryBtn, pressed && styles.pressed]}
+                >
+                  <Text style={styles.secondaryText}>
+                    {mode === "signin" ? t("auth.signUp") : t("auth.signIn")}
+                  </Text>
+                </Pressable>
+
+                <View style={styles.divider}>
+                  <View style={styles.dividerLine} />
+                  <Text style={styles.dividerText}>{t("auth.orDivider")}</Text>
+                  <View style={styles.dividerLine} />
+                </View>
+
+                <Pressable
+                  onPress={() => oauth("google")}
+                  disabled={busy}
+                  accessibilityRole="button"
+                  style={({ pressed }) => [
+                    styles.oauthBtn,
+                    pressed && styles.pressed,
+                    busy && styles.disabled,
+                  ]}
+                >
+                  <Text style={styles.oauthText}>{t("auth.continueWithGoogle")}</Text>
+                </Pressable>
+
+                {appleAvailable ? (
+                  <Pressable
+                    onPress={() => oauth("apple")}
+                    disabled={busy}
+                    accessibilityRole="button"
+                    style={({ pressed }) => [
+                      styles.oauthBtn,
+                      pressed && styles.pressed,
+                      busy && styles.disabled,
+                    ]}
+                  >
+                    <Text style={styles.oauthText}>{t("auth.continueWithApple")}</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
+const INK = "#063A48";
+
 const styles = StyleSheet.create({
-  langRow: { paddingHorizontal: SPACING.xl, paddingTop: SPACING.sm, alignItems: "flex-end" },
-  hero: { alignItems: "center", paddingTop: SPACING.xxl, paddingBottom: SPACING.xl },
-  heroGlow: {
-    position: "absolute",
-    top: -60,
-    width: 320,
-    height: 220,
-    borderRadius: 160,
-    opacity: 0.9,
-  },
-  brandMark: { fontSize: 34, color: COLORS.accent, marginBottom: SPACING.sm },
-  brand: { ...TYPE.display, color: COLORS.text, letterSpacing: -0.5 },
-  tagline: {
-    ...TYPE.small,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.sm,
-    textAlign: "center",
-    maxWidth: 260,
-  },
-  body: { paddingHorizontal: SPACING.xl, gap: SPACING.lg },
-  tabs: {
-    flexDirection: "row",
-    backgroundColor: COLORS.glass,
-    borderRadius: RADIUS.pill,
-    padding: 4,
+  root: { flex: 1, backgroundColor: "#063A48" },
+  safe: { flex: 1 },
+  flex: { flex: 1 },
+  scroll: { flexGrow: 1, justifyContent: "center", paddingVertical: SPACING.lg },
+
+  langRow: { paddingHorizontal: SPACING.xl, alignItems: "flex-end", paddingBottom: SPACING.md },
+
+  // Hairline-bordered panel, echoing the reference's inset card edge.
+  card: {
+    marginHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.xxl,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: "rgba(255,255,255,0.34)",
+    borderRadius: 4,
   },
-  tab: { flex: 1, paddingVertical: 11, borderRadius: RADIUS.pill, alignItems: "center" },
-  tabActive: { backgroundColor: COLORS.accent },
-  tabText: { ...TYPE.small, fontWeight: "600", color: COLORS.textSecondary },
-  tabTextActive: { color: COLORS.onAccent },
-  form: { gap: SPACING.lg },
-  divider: { flexDirection: "row", alignItems: "center", gap: SPACING.md },
-  dividerLine: { flex: 1, height: 1, backgroundColor: COLORS.border },
-  dividerText: { ...EYEBROW, color: COLORS.textMuted },
+
+  brandRow: { flexDirection: "row", alignItems: "center", gap: SPACING.md },
+  wordmark: { justifyContent: "center" },
+  brandTop: {
+    fontSize: 26,
+    lineHeight: 28,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    letterSpacing: 1,
+  },
+  brandBottom: {
+    fontSize: 26,
+    lineHeight: 28,
+    fontWeight: "300",
+    color: "#FFFFFF",
+    letterSpacing: 5.5,
+  },
+
+  welcome: {
+    fontSize: 27,
+    lineHeight: 33,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginTop: SPACING.xxl,
+  },
+  welcomeSub: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: "rgba(255,255,255,0.86)",
+    marginTop: 4,
+  },
+
+  form: { marginTop: SPACING.xxl, gap: SPACING.lg },
+
+  field: { gap: 7 },
+  fieldLabel: { fontSize: 14, fontWeight: "600", color: "#FFFFFF" },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 4,
+    paddingHorizontal: 14,
+    minHeight: 52,
+  },
+  glyph: { fontSize: 16, color: INK, marginRight: 10, opacity: 0.75 },
+  input: { flex: 1, fontSize: 15, color: INK, paddingVertical: 14 },
+
+  metaRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  rememberPress: { flexDirection: "row", alignItems: "center", gap: 10 },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 3,
+    backgroundColor: "rgba(255,255,255,0.85)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxOn: { backgroundColor: "#FFFFFF" },
+  checkboxTick: { color: INK, fontSize: 14, fontWeight: "800" },
+  rememberText: { fontSize: 15, color: "#FFFFFF" },
+  forgot: {
+    fontSize: 15,
+    color: "#FFFFFF",
+    textDecorationLine: "underline",
+  },
+
+  errorBox: {
+    backgroundColor: "rgba(255,255,255,0.16)",
+    borderLeftWidth: 3,
+    borderLeftColor: "#FFD5DC",
+    borderRadius: 3,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  errorText: { fontSize: 13, lineHeight: 18, color: "#FFFFFF" },
+
+  primaryBtn: {
+    minHeight: 54,
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: SPACING.sm,
+  },
+  primaryText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    letterSpacing: 1.6,
+    textTransform: "uppercase",
+  },
+
+  secondaryBtn: {
+    minHeight: 54,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  secondaryText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: INK,
+    letterSpacing: 1.6,
+    textTransform: "uppercase",
+  },
+
+  divider: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: SPACING.xs },
+  dividerLine: { flex: 1, height: 1, backgroundColor: "rgba(255,255,255,0.32)" },
+  dividerText: {
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1.6,
+    color: "rgba(255,255,255,0.75)",
+    textTransform: "uppercase",
+  },
+
+  oauthBtn: {
+    minHeight: 52,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.5)",
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  oauthText: { fontSize: 15, fontWeight: "600", color: "#FFFFFF" },
+
+  pressed: { opacity: 0.75 },
+  disabled: { opacity: 0.45 },
 });

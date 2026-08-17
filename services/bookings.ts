@@ -29,6 +29,12 @@ export interface Booking {
   // Written by the loyalty triggers — read-only from the client's point of view.
   points_redeemed: number;
   loyalty_discount: number;
+  pickup_address: string | null;
+  pickup_lat: number | null;
+  pickup_lng: number | null;
+  dropoff_address: string | null;
+  dropoff_lat: number | null;
+  dropoff_lng: number | null;
 }
 
 export interface BookingInsertPayload {
@@ -46,6 +52,12 @@ export interface BookingInsertPayload {
   promo_code?: string | null;
   /** A *request* to spend points. The DB trigger clamps it to the real balance. */
   points_requested?: number;
+  pickup_address?: string | null;
+  pickup_lat?: number | null;
+  pickup_lng?: number | null;
+  dropoff_address?: string | null;
+  dropoff_lat?: number | null;
+  dropoff_lng?: number | null;
 }
 
 const PHONE_RE = /^[+]?[\d\s()-]{7,20}$/;

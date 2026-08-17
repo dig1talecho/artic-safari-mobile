@@ -6,60 +6,65 @@
 // held further from the eye relative to its pixel density.
 
 export const COLORS = {
-  // Ground
-  background: "#05070D",
-  backgroundAlt: "#080C15",
-  surface: "#0D1420",
-  surfaceElevated: "#141C2B",
-  surfaceSunken: "#03050A",
+  // Ground — flatter and cooler than before. Solid surfaces, no gradient
+  // soup, because this is read at a glance in a moving car at night.
+  background: "#0B0E14",
+  backgroundAlt: "#10141C",
+  surface: "#151A23",
+  surfaceElevated: "#1C222D",
+  surfaceSunken: "#070910",
 
-  // Glass
-  glass: "rgba(255, 255, 255, 0.045)",
-  glassStrong: "rgba(255, 255, 255, 0.075)",
-  border: "rgba(255, 255, 255, 0.09)",
-  borderStrong: "rgba(125, 231, 235, 0.28)",
+  // Glass — kept, but far more restrained
+  glass: "rgba(255, 255, 255, 0.04)",
+  glassStrong: "rgba(255, 255, 255, 0.07)",
+  border: "rgba(255, 255, 255, 0.10)",
+  borderStrong: "rgba(34, 211, 238, 0.42)",
 
-  // Aurora accents — the cyan family carried over from the website
-  accent: "#5CE1E6",
-  accentDeep: "#33BBCF",
-  accentSoft: "rgba(92, 225, 230, 0.13)",
-  accentGlow: "rgba(92, 225, 230, 0.42)",
-  ice: "#9DEDF0",
+  // Brand cyan, punchier than the old soft aurora tint
+  accent: "#22D3EE",
+  accentDeep: "#0E9BB5",
+  accentSoft: "rgba(34, 211, 238, 0.12)",
+  accentGlow: "rgba(34, 211, 238, 0.30)",
+  ice: "#A5F3FC",
 
-  // Secondary accent for premium touches (points, badges)
+  // Dispatch amber — taxi urgency. Distinct from brand cyan on purpose so
+  // "a ride is waiting" never reads as decoration.
+  dispatch: "#F59E0B",
+  dispatchSoft: "rgba(245, 158, 11, 0.13)",
+
   gold: "#E4C27E",
   goldSoft: "rgba(228, 194, 126, 0.14)",
 
   // Semantic
-  success: "#4ADE80",
-  successSoft: "rgba(74, 222, 128, 0.13)",
+  success: "#34D399",
+  successSoft: "rgba(52, 211, 153, 0.13)",
   warning: "#FBBF24",
   warningSoft: "rgba(251, 191, 36, 0.13)",
-  danger: "#FB7185",
-  dangerSoft: "rgba(251, 113, 133, 0.13)",
+  danger: "#F87171",
+  dangerSoft: "rgba(248, 113, 113, 0.13)",
 
-  // Text
-  text: "#F4F8FC",
-  textSecondary: "#A3B1C6",
-  textMuted: "#64748B",
+  // Text — higher contrast than before
+  text: "#F8FAFC",
+  textSecondary: "#B4C0D3",
+  textMuted: "#6B7A90",
   onAccent: "#04121A",
 
   // Legacy aliases kept for the original driver-app components (see the
   // note at the bottom of this file). Not for new code.
-  glassSurface: "rgba(255, 255, 255, 0.045)",
-  glassBorder: "rgba(255, 255, 255, 0.09)",
-  glassBorderStrong: "rgba(125, 231, 235, 0.28)",
-  auroraEmerald: "#4ADE80",
-  auroraTeal: "#5CE1E6",
-  auroraIce: "#9DEDF0",
+  glassSurface: "rgba(255, 255, 255, 0.04)",
+  glassBorder: "rgba(255, 255, 255, 0.10)",
+  glassBorderStrong: "rgba(34, 211, 238, 0.42)",
+  auroraEmerald: "#34D399",
+  auroraTeal: "#22D3EE",
+  auroraIce: "#A5F3FC",
   auroraViolet: "#A78BFA",
-  textPrimary: "#F4F8FC",
+  textPrimary: "#F8FAFC",
   pending: "#FBBF24",
 } as const;
 
 /** The website's exact CTA gradient — the one visual thread tying the two together. */
-export const GRADIENT_CTA = ["#9DEDF0", "#5CE1E6", "#33BBCF"] as const;
-export const GRADIENT_CARD = ["#151C2A", "#0C121C"] as const;
+export const GRADIENT_CTA = ["#67E8F9", "#22D3EE", "#0E9BB5"] as const;
+export const GRADIENT_CARD = ["#151A23", "#131820"] as const;
 export const GRADIENT_GOLD = ["#F0D9A8", "#E4C27E", "#C9A25C"] as const;
 export const GRADIENT_SCRIM = ["transparent", "rgba(5,7,13,0.75)", "#05070D"] as const;
 
@@ -106,15 +111,15 @@ export const SHADOW = {
   card: {
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.4,
-    shadowRadius: 24,
+    shadowOpacity: 0.28,
+    shadowRadius: 14,
     elevation: 8,
   },
   glow: {
     shadowColor: COLORS.accent,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 20,
+    shadowOpacity: 0.22,
+    shadowRadius: 12,
     elevation: 10,
   },
   none: {},

@@ -102,6 +102,7 @@ export default function TransferScreen() {
   const { session, profile } = useAuth();
 
   const [origin, setOrigin] = useState("");
+  const [originCoords, setOriginCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [destination, setDestination] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -124,6 +125,7 @@ export default function TransferScreen() {
     }
     const pos = await Location.getCurrentPositionAsync({});
     setOrigin(`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`);
+    setOriginCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
   };
 
   const calculate = async () => {
@@ -165,6 +167,10 @@ export default function TransferScreen() {
       total_price: quote.price,
       notes: `Pickup: ${quote.originAddress} → Dropoff: ${quote.destinationAddress} (${quote.distanceKm} km, ~${quote.durationMinutes} min)`,
       status: "pending",
+      pickup_address: quote.originAddress,
+      pickup_lat: originCoords?.lat ?? null,
+      pickup_lng: originCoords?.lng ?? null,
+      dropoff_address: quote.destinationAddress,
     });
 
     setSubmitting(false);
