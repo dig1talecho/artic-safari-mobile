@@ -1,10 +1,13 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { Card, Divider, GhostButton, Row, Screen, ScreenHeader } from "../components/ui";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useTranslation } from "../i18n";
 import { useAuth } from "../lib/useAuth";
 import { COLORS, SPACING, TYPE } from "../constants/theme";
 import { isPaymentEnabled } from "../services/payments";
+
+/** Same policy the website serves — one document, not two that can drift. */
+const PRIVACY_URL = "https://www.articsafaritour.com/privacy";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -43,6 +46,22 @@ export default function ProfileScreen() {
           </Card>
         ) : null}
 
+        {/*
+          Both app stores require a reachable privacy policy link, and the
+          app asks for location permission — so the explanation has to be
+          one tap away, not buried on a website the guest never visits.
+        */}
+        <Card>
+          <Text style={styles.sectionLabel}>{t("privacy.title")}</Text>
+          <Text style={styles.privacyBody}>{t("privacy.locationNote")}</Text>
+          <Pressable
+            onPress={() => Linking.openURL(PRIVACY_URL)}
+            style={({ pressed }) => [styles.privacyLink, pressed && styles.pressed]}
+          >
+            <Text style={styles.privacyLinkText}>{t("privacy.readPolicy")} ↗</Text>
+          </Pressable>
+        </Card>
+
         <GhostButton label={t("auth.signOut")} onPress={signOut} />
       </View>
     </Screen>
@@ -55,4 +74,8 @@ const styles = StyleSheet.create({
   email: { ...TYPE.body, color: COLORS.text, fontWeight: "600", marginTop: SPACING.sm },
   paymentNote: { ...TYPE.small, color: COLORS.warning, fontWeight: "600", marginTop: SPACING.sm },
   paymentBody: { ...TYPE.caption, color: COLORS.textSecondary, fontWeight: "400", marginTop: SPACING.sm },
+  privacyBody: { ...TYPE.caption, color: COLORS.textSecondary, fontWeight: "400", marginTop: SPACING.sm },
+  privacyLink: { marginTop: SPACING.md, minHeight: 34, justifyContent: "center" },
+  privacyLinkText: { ...TYPE.small, color: COLORS.accent, fontWeight: "600" },
+  pressed: { opacity: 0.7 },
 });

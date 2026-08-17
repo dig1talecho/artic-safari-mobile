@@ -198,6 +198,13 @@ export const en = {
     approxPickup: "Typed address — no exact pin, opens as a map search",
   },
 
+  privacy: {
+    title: "Privacy",
+    locationNote:
+      "Sharing your location is optional and only happens when you tap “Use my location”. We use it once, to place your pickup point.",
+    readPolicy: "Read our privacy policy",
+  },
+
   settings: {
     title: "Settings",
     language: "Language",
@@ -410,6 +417,13 @@ export const no = {
     noCoords: "Ingen hentekoordinater lagret for denne forespørselen ennå.",
     noPickup: "Ingen henteadresse registrert for denne forespørselen.",
     approxPickup: "Skrevet adresse — ingen nøyaktig posisjon, åpnes som kartsøk",
+  },
+
+  privacy: {
+    title: "Personvern",
+    locationNote:
+      "Å dele posisjonen din er valgfritt og skjer bare når du trykker «Bruk min posisjon». Vi bruker den én gang, for å sette hentestedet ditt.",
+    readPolicy: "Les personvernerklæringen vår",
   },
 
   settings: {
