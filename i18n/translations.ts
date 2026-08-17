@@ -194,6 +194,8 @@ export const en = {
     takeJob: "Take this job",
     alreadyTaken: "Another driver just took this job.",
     noCoords: "No pickup coordinates stored for this request yet.",
+    noPickup: "No pickup address recorded for this request.",
+    approxPickup: "Typed address — no exact pin, opens as a map search",
   },
 
   settings: {
@@ -406,6 +408,8 @@ export const no = {
     takeJob: "Ta dette oppdraget",
     alreadyTaken: "En annen sjåfør tok nettopp dette oppdraget.",
     noCoords: "Ingen hentekoordinater lagret for denne forespørselen ennå.",
+    noPickup: "Ingen henteadresse registrert for denne forespørselen.",
+    approxPickup: "Skrevet adresse — ingen nøyaktig posisjon, åpnes som kartsøk",
   },
 
   settings: {

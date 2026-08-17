@@ -148,8 +148,25 @@ export default function RequestsScreen({ navigation }: any) {
     if (!filters.includes(filter)) setFilter("open");
   }, [filters, filter]);
 
-  const coordsOf = (b: Booking) =>
-    b.pickup_lat != null && b.pickup_lng != null ? { lat: b.pickup_lat, lng: b.pickup_lng } : null;
+  /**
+   * A map URL for every request that has a pickup at all.
+   *
+   * Exact coordinates when the guest picked a geocoded result. When they
+   * typed a place the geocoder didn't match there are no coordinates, but
+   * the text is still the only thing the driver has to go on -- so this
+   * falls back to a map *search* rather than hiding the button. "Tromsø,
+   * Norway" is appended unless the text already says it, so a bare hotel
+   * name can't resolve to a same-named street in another country.
+   */
+  const mapUrlFor = (b: Booking) => {
+    if (b.pickup_lat != null && b.pickup_lng != null) {
+      return `https://www.google.com/maps?q=${b.pickup_lat},${b.pickup_lng}`;
+    }
+    const text = b.pickup_address?.trim();
+    if (!text) return null;
+    const query = /troms[øo]/i.test(text) ? text : `${text}, Tromsø, Norway`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  };
 
   const stripeFor = (b: Booking) => {
     if (b.status === "cancelled") return COLORS.danger;
@@ -241,7 +258,8 @@ export default function RequestsScreen({ navigation }: any) {
       ) : (
         <View style={styles.list}>
           {visible.map((b) => {
-            const coords = coordsOf(b);
+            const mapUrl = mapUrlFor(b);
+            const exact = b.pickup_lat != null && b.pickup_lng != null;
             const mine = b.assigned_driver === staff?.display_name;
             const open = !b.assigned_driver && b.status !== "cancelled";
 
@@ -270,9 +288,15 @@ export default function RequestsScreen({ navigation }: any) {
                           → {b.dropoff_address}
                         </Text>
                       ) : null}
+                      {/* Say so rather than letting a searched address look
+                          like a surveyed pin -- the driver decides how much
+                          slack to leave for it. */}
+                      {!exact ? (
+                        <Text style={styles.approx}>{t("requests.approxPickup")}</Text>
+                      ) : null}
                     </>
                   ) : (
-                    <Text style={styles.pickupMissing}>{t("requests.noCoords")}</Text>
+                    <Text style={styles.pickupMissing}>{t("requests.noPickup")}</Text>
                   )}
 
                   {/* Row 3: who + what */}
@@ -294,15 +318,13 @@ export default function RequestsScreen({ navigation }: any) {
 
                   {/* Actions — full-width targets, easy to hit one-handed. */}
                   <View style={styles.actions}>
-                    {coords ? (
+                    {mapUrl ? (
                       <Pressable
-                        onPress={() =>
-                          Linking.openURL(`https://www.google.com/maps?q=${coords.lat},${coords.lng}`)
-                        }
+                        onPress={() => Linking.openURL(mapUrl)}
                         style={({ pressed }) => [styles.secondaryAction, pressed && styles.pressed]}
                       >
                         <Text style={styles.secondaryActionText}>
-                          ◎ {t("tracking.openInMaps")}
+                          {exact ? "◎" : "⌕"} {t("tracking.openInMaps")}
                         </Text>
                       </Pressable>
                     ) : null}
@@ -426,6 +448,7 @@ const styles = StyleSheet.create({
 
   pickup: { fontSize: 17, lineHeight: 23, fontWeight: "600", color: COLORS.text, marginTop: 6 },
   dropoff: { ...TYPE.small, color: COLORS.textSecondary, marginTop: 2 },
+  approx: { ...TYPE.caption, color: COLORS.warning, fontWeight: "500", marginTop: 4 },
   pickupMissing: { ...TYPE.small, color: COLORS.textMuted, fontStyle: "italic", marginTop: 6 },
 
   metaRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6 },
