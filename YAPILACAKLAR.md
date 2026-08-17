@@ -23,6 +23,28 @@ yazıyor.
 
 ---
 
+## 🔴 ADIM 1.5 — Şoför sadece taksi işlerini görsün (1 dakika)
+
+**Yapmazsan:** Uygulamada şoföre zaten sadece taksi istekleri gösteriliyor,
+ama bu sadece ekran filtresi. Veritabanı hâlâ şoförün tur rezervasyonlarını
+da okumasına izin veriyor. Bu dosya o izni kapatıyor.
+
+1. Supabase → **SQL Editor** → **New query**
+2. Şu dosyanın tamamını kopyala-yapıştır:
+   `Desktop\Artic-Safari\supabase-driver-taxi-only-rls.sql`
+3. **Run** → "Success"
+
+Sonra kontrol etmek istersen, aynı ekranda şunu çalıştır — sadece
+`transfer` ve `tour` görmelisin:
+
+```sql
+select booking_type, count(*) from bookings group by 1 order by 2 desc;
+```
+
+Başka bir değer çıkarsa bana söyle, SQL'i ona göre güncellerim.
+
+---
+
 ## 🟡 ADIM 2 — Puan oranını kontrol et (1 dakika)
 
 Şu an ayarlı: **%2 geri kazanım** (100 kr harcama = 2 puan, 1 puan = 1 kr)
@@ -121,28 +143,20 @@ Vipps/Stripe anlaşman olduğunda bana söyle. O zaman gereken:
 
 ---
 
-## ❓ Karar vermen gereken bir konu
+## ⚠️ Bilmen gereken tek eksik: kapalıyken bildirim
 
-Bu klasörde **iki farklı uygulama** var:
+Uygulama **açıkken** bildirimler anında geliyor (banner + sekmede "+1" +
+titreşim). Ama uygulama **kapalıyken** telefona bildirim düşmüyor.
 
-1. **Sürücü uygulaması** — sen başlatmışsın, tüm rezervasyonları listeliyor
-2. **Müşteri uygulaması** — bugün ben yaptım (turlar, rezervasyon, puan,
-   canlı takip, transfer)
-
-Şu an **müşteri uygulaması** açılıyor, sürücü ekranı dosyalarda duruyor ama
-kullanılmıyor (ona hiç dokunmadım).
-
-**Ne istersin?**
-- **A)** Sadece müşteri uygulaması olsun → hiçbir şey yapma, şu an böyle
-- **B)** İkisi de tek uygulamada olsun, giriş yapana göre değişsin
-- **C)** Sürücü için ayrı bir uygulama olsun
-
-Bana söyle, ona göre düzenlerim.
+Sebebi teknik: Expo Go artık kapalı uygulamaya bildirim göndermiyor.
+Bunun için "development build" gerekiyor (ADIM 5'in alt kısmı). Hazır
+olduğunda söyle, birlikte yaparız.
 
 ---
 
-## ✅ Bugün hazır olanlar (senden bir şey gerekmiyor)
+## ✅ Hazır olanlar (senden bir şey gerekmiyor)
 
+**Müşteri tarafı**
 - Üyelik / giriş (e-posta + şifre)
 - Tur listesi ve tur detay sayfaları — web sitesindeki turlarla **aynı
   veriden** besleniyor, admin panelinden tur eklersen uygulamada da çıkar
@@ -152,4 +166,15 @@ Bana söyle, ona göre düzenlerim.
 - Canlı sürücü takibi (sürücü konum göndermeye başlayınca)
 - Transfer fiyat hesaplama + adres arama + konumumu kullan
 - Puan/ödül ekranı
+
+**Şoför / yönetici tarafı** (aynı uygulama, giriş yapana göre değişiyor)
+- Web sitesinin admin/şoför bilgileriyle giriş → doğrudan istek kuyruğu
+- Şoför **sadece taksi** isteklerini görür
+- Yönetici **Taksi / Turlar** diye iki bölüm arasında geçiş yapar
+- Açık / Bendeki / Kapanmış filtreleri, her birinde sayı
+- Anlık bildirim: banner + sekmede "+1" + titreşim
+- "Bu işi al" — iki şoför aynı anda basarsa sadece biri alır
+- Haritada aç (Google Maps) — koordinat kayıtlıysa
+
+**Her ikisi**
 - **İngilizce ve Norveççe dil seçeneği** (profil ekranından değiştirilir)

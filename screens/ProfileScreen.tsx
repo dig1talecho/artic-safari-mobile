@@ -8,11 +8,14 @@ import { isPaymentEnabled } from "../services/payments";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
-  const { session, profile, signOut } = useAuth();
+  const { session, profile, staff, role, signOut } = useAuth();
 
   return (
     <Screen scroll>
-      <ScreenHeader eyebrow={t("nav.profile")} title={profile?.full_name || t("nav.profile")} />
+      <ScreenHeader
+        eyebrow={role ? role.toUpperCase() : t("nav.profile")}
+        title={staff?.display_name || profile?.full_name || t("nav.profile")}
+      />
 
       <View style={styles.body}>
         <Card>
@@ -32,7 +35,7 @@ export default function ProfileScreen() {
 
         {/* Honest state: no processor is connected, so say so rather than
             showing a dead "Payment methods" row that leads nowhere. */}
-        {!isPaymentEnabled() ? (
+        {role === "customer" && !isPaymentEnabled() ? (
           <Card>
             <Text style={styles.sectionLabel}>{t("payment.title")}</Text>
             <Text style={styles.paymentNote}>{t("payment.notConnected")}</Text>

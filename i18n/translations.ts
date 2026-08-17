@@ -25,6 +25,8 @@ export const en = {
     transfer: "Transfer",
     rewards: "Rewards",
     profile: "Profile",
+    requests: "Requests",
+    map: "Map",
   },
 
   auth: {
@@ -40,6 +42,15 @@ export const en = {
     orDivider: "or",
     signedInAs: "Signed in as",
     notConfigured: "This sign-in method is not set up yet.",
+    welcomeBack: "Welcome back!",
+    welcomeBackSub: "Log in to access your Artic Safari account",
+    welcomeNew: "Create your account",
+    welcomeNewSub: "Join us and start chasing the lights",
+    rememberMe: "Remember me",
+    forgotPassword: "Forgot Password",
+    forgotNeedsEmail: "Enter your email address first, then tap Forgot Password.",
+    forgotSentTitle: "Reset link sent",
+    forgotSentBody: "We emailed a password reset link to {{email}}. Open it, set a new password, then sign in here.",
   },
 
   tours: {
@@ -165,6 +176,26 @@ export const en = {
     requestInstead: "Send booking request",
   },
 
+  requests: {
+    title: "Requests",
+    adminEyebrow: "Operations",
+    driverEyebrow: "Driver",
+    section_taxi: "Taxi",
+    section_tours: "Tours",
+    newTaxi: "New taxi request",
+    newTour: "New tour booking",
+    filter_open: "Open",
+    filter_mine: "Mine",
+    filter_assigned: "Assigned",
+    filter_all: "All",
+    empty: "No requests here right now.",
+    unassigned: "Unassigned",
+    assignedTo: "Assigned to",
+    takeJob: "Take this job",
+    alreadyTaken: "Another driver just took this job.",
+    noCoords: "No pickup coordinates stored for this request yet.",
+  },
+
   settings: {
     title: "Settings",
     language: "Language",
@@ -206,6 +237,8 @@ export const no = {
     transfer: "Transport",
     rewards: "Poeng",
     profile: "Profil",
+    requests: "Forespørsler",
+    map: "Kart",
   },
 
   auth: {
@@ -221,6 +254,15 @@ export const no = {
     orDivider: "eller",
     signedInAs: "Innlogget som",
     notConfigured: "Denne innloggingsmetoden er ikke satt opp ennå.",
+    welcomeBack: "Velkommen tilbake!",
+    welcomeBackSub: "Logg inn for å se Artic Safari-kontoen din",
+    welcomeNew: "Opprett kontoen din",
+    welcomeNewSub: "Bli med oss og jakt nordlyset",
+    rememberMe: "Husk meg",
+    forgotPassword: "Glemt passord",
+    forgotNeedsEmail: "Skriv inn e-postadressen din først, og trykk så Glemt passord.",
+    forgotSentTitle: "Lenke sendt",
+    forgotSentBody: "Vi har sendt en lenke for å tilbakestille passordet til {{email}}. Åpne den, velg nytt passord, og logg inn her.",
   },
 
   tours: {
@@ -344,6 +386,26 @@ export const no = {
     payWithVipps: "Betal med Vipps",
     payWithCard: "Betal med kort",
     requestInstead: "Send bestillingsforespørsel",
+  },
+
+  requests: {
+    title: "Forespørsler",
+    adminEyebrow: "Drift",
+    driverEyebrow: "Sjåfør",
+    section_taxi: "Taxi",
+    section_tours: "Turer",
+    newTaxi: "Ny taxiforespørsel",
+    newTour: "Ny turbestilling",
+    filter_open: "Ledige",
+    filter_mine: "Mine",
+    filter_assigned: "Tildelt",
+    filter_all: "Alle",
+    empty: "Ingen forespørsler akkurat nå.",
+    unassigned: "Ikke tildelt",
+    assignedTo: "Tildelt",
+    takeJob: "Ta dette oppdraget",
+    alreadyTaken: "En annen sjåfør tok nettopp dette oppdraget.",
+    noCoords: "Ingen hentekoordinater lagret for denne forespørselen ennå.",
   },
 
   settings: {
