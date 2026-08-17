@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import { isBookableDate } from "../lib/dates";
 import type { CartAddon } from "./tours";
 
 // Mirror of the web app's services/bookings.service.ts, plus the loyalty
@@ -70,11 +71,10 @@ function validate(p: BookingInsertPayload): string | null {
     return "Please enter a valid phone number";
   if (!/^\d{4}-\d{2}-\d{2}$/.test(p.booking_date)) return "Invalid date";
 
-  const when = new Date(`${p.booking_date}T00:00:00`);
-  const today = new Date(new Date().toDateString());
-  const twoYears = new Date(today);
-  twoYears.setFullYear(today.getFullYear() + 2);
-  if (Number.isNaN(when.getTime()) || when < today || when > twoYears)
+  // Compared as plain text against today in Tromso. This used to build
+  // Date objects and check a UTC-derived value against the phone's local
+  // midnight, which rejected every booking made after 22:00 local time.
+  if (!isBookableDate(p.booking_date))
     return "Please choose a real date between today and 2 years from now";
 
   if (!(p.total_price > 0) || p.total_price > 50000) return "Price is out of range";

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import * as Location from "expo-location";
+import { tromsoToday } from "../lib/dates";
 import {
   Card,
   ErrorNote,
@@ -163,7 +164,7 @@ export default function TransferScreen() {
       customer_phone: profile?.phone || null,
       booking_type: "transfer",
       item_title: "Custom Route Transfer",
-      booking_date: new Date().toISOString().split("T")[0],
+      booking_date: tromsoToday(),
       total_price: quote.price,
       notes: `Pickup: ${quote.originAddress} → Dropoff: ${quote.destinationAddress} (${quote.distanceKm} km, ~${quote.durationMinutes} min)`,
       status: "pending",

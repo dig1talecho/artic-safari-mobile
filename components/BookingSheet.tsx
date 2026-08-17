@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import * as Haptics from "expo-haptics";
+import { tromsoToday } from "../lib/dates";
 import {
   Card,
   Divider,
@@ -47,9 +48,8 @@ import {
   type LoyaltyRules,
 } from "../services/loyalty";
 
-function todayISO() {
-  return new Date().toISOString().split("T")[0];
-}
+/** Today in Tromso, not UTC -- see lib/dates.ts for why that matters. */
+const todayISO = tromsoToday;
 
 export default function BookingSheet({
   tour,

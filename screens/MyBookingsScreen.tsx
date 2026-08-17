@@ -14,12 +14,7 @@ import { useTranslation, formatCurrency } from "../i18n";
 import { useAuth } from "../lib/useAuth";
 import { COLORS, SPACING, STATUS_STYLE, TYPE } from "../constants/theme";
 import { listMyBookings, type Booking } from "../services/bookings";
-
-function daysUntil(dateStr: string) {
-  const target = new Date(`${dateStr}T00:00:00`);
-  const today = new Date(new Date().toDateString());
-  return Math.round((target.getTime() - today.getTime()) / 86_400_000);
-}
+import { daysUntil } from "../lib/dates";
 
 export default function MyBookingsScreen({ navigation }: any) {
   const { t, language } = useTranslation();
