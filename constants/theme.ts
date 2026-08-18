@@ -144,6 +144,28 @@ export const STATUS_STYLE: Record<
     background: COLORS.dangerSoft,
     labelKey: "myBookings.statusCancelled",
   },
+  // Added with the lifecycle state machine. Anything not listed falls
+  // back at the call site rather than rendering an unstyled badge.
+  assigned: {
+    color: COLORS.accent,
+    background: COLORS.accentSoft,
+    labelKey: "myBookings.statusAssigned",
+  },
+  in_progress: {
+    color: COLORS.dispatch,
+    background: COLORS.dispatchSoft,
+    labelKey: "myBookings.statusInProgress",
+  },
+  completed: {
+    color: COLORS.success,
+    background: COLORS.successSoft,
+    labelKey: "myBookings.statusCompleted",
+  },
+  no_show: {
+    color: COLORS.danger,
+    background: COLORS.dangerSoft,
+    labelKey: "myBookings.statusNoShow",
+  },
 };
 
 // ---------------------------------------------------------------------------

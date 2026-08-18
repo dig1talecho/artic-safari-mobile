@@ -9,8 +9,18 @@ import type { CartAddon } from "./tours";
 // partner trigger). This is a fast client-side guard, not the security
 // boundary.
 
-export type BookingStatus = "pending" | "confirmed" | "cancelled";
-export type PaymentStatus = "paid" | "pending" | "refunded";
+// Mirrors lib/booking-lifecycle.ts in the web project and the CHECK
+// constraint in Postgres. Legality of any move is decided by
+// trg_enforce_booking_status_transition, not here.
+export type BookingStatus =
+  | "pending"
+  | "confirmed"
+  | "assigned"
+  | "in_progress"
+  | "completed"
+  | "cancelled"
+  | "no_show";
+export type PaymentStatus = "pending" | "processing" | "paid" | "failed" | "refunded";
 
 export interface Booking {
   id: string;

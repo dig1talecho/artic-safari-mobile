@@ -95,7 +95,10 @@ export default function RequestsScreen({ navigation }: any) {
 
     const { data, error: err } = await supabase
       .from("bookings")
-      .update({ assigned_driver: staff.display_name })
+      // Claim and advance in one statement. A job that has a driver but
+      // still says "confirmed" is a lie the queue would then have to
+      // reason about.
+      .update({ assigned_driver: staff.display_name, status: "assigned" })
       .eq("id", booking.id)
       .is("assigned_driver", null)
       .select();
