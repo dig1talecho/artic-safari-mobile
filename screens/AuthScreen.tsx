@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,7 +16,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 
 import FacetedBackdrop from "../components/FacetedBackdrop";
-import FoxMark from "../components/FoxMark";
+// The brand mark is now artwork, not a drawn component. FoxMark and
+// PolarBearMark stay in the repo but are unused -- keeping them costs
+// nothing and they are the record of how the mark got here.
+const LOGO = require("../assets/logo.png");
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useTranslation } from "../i18n";
 import { SPACING } from "../constants/theme";
@@ -158,7 +162,7 @@ export default function AuthScreen() {
                 left column — the reference's split layout has no room here. */}
             <View style={styles.card}>
               <View style={styles.brandRow}>
-                <FoxMark size={58} color="#FFFFFF" />
+                <Image source={LOGO} style={styles.brandMark} resizeMode="contain" />
                 <View style={styles.wordmark}>
                   <Text style={styles.brandTop}>ARTIC</Text>
                   <Text style={styles.brandBottom}>SAFARI</Text>
@@ -322,6 +326,9 @@ export default function AuthScreen() {
 const INK = "#063A48";
 
 const styles = StyleSheet.create({
+  // Sized to the ring it sits in. contain, never cover: cropping a logo
+  // is the one thing you must never do to it.
+  brandMark: { width: 62, height: 62 },
   root: { flex: 1, backgroundColor: "#063A48" },
   safe: { flex: 1 },
   flex: { flex: 1 },
