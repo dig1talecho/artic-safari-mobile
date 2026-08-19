@@ -9,6 +9,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { useAuth } from "../lib/useAuth";
 import { useTranslation } from "../i18n";
+import { useLoyaltyAvailable } from "../lib/useLoyaltyAvailable";
 import { useNotifications } from "../lib/useNotifications";
 import NotificationBanner from "../components/NotificationBanner";
 import { COLORS, TYPE } from "../constants/theme";
@@ -76,6 +77,7 @@ const tabScreenOptions = ({ route }: any) => ({
 /** Guests: browse, book, track their own trip, spend points. */
 function CustomerTabs() {
   const { t } = useTranslation();
+  const loyaltyAvailable = useLoyaltyAvailable();
   return (
     <Tab.Navigator screenOptions={tabScreenOptions}>
       <Tab.Screen name="ToursTab" component={ToursScreen} options={{ title: t("nav.tours") }} />
@@ -89,7 +91,15 @@ function CustomerTabs() {
         component={MyBookingsScreen}
         options={{ title: t("nav.bookings") }}
       />
-      <Tab.Screen name="RewardsTab" component={RewardsScreen} options={{ title: t("nav.rewards") }} />
+      {/*
+        Rewards only appears when the migration behind it has been run.
+        An empty tab that can never do anything is worse than no tab -- and
+        this way switching the feature on later is a database change, with
+        no app release involved.
+      */}
+      {loyaltyAvailable ? (
+        <Tab.Screen name="RewardsTab" component={RewardsScreen} options={{ title: t("nav.rewards") }} />
+      ) : null}
       <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ title: t("nav.profile") }} />
     </Tab.Navigator>
   );

@@ -94,3 +94,42 @@ export function maxRedeemableFor(
   const maxDiscount = Math.round((subtotal * rules.max_redeem_percent) / 100);
   return Math.max(0, Math.min(balance, Math.floor(maxDiscount / rules.kr_per_point)));
 }
+
+/**
+ * Is the rewards module actually installed?
+ *
+ * The whole feature lives behind one migration. When it has not been run,
+ * every read here already degrades to null -- but a Rewards tab that opens
+ * to an empty screen, and a "use your points" box that can never do
+ * anything, are worse than not offering them. A promise the system cannot
+ * keep is the one thing this project has consistently refused to ship.
+ *
+ * Probed once per app launch and cached. A missing table is a permanent
+ * fact for the life of the session, not something worth re-asking on every
+ * screen mount.
+ */
+let loyaltyAvailable: boolean | null = null;
+let inFlight: Promise<boolean> | null = null;
+
+export function resetLoyaltyAvailability() {
+  loyaltyAvailable = null;
+  inFlight = null;
+}
+
+export async function isLoyaltyAvailable(): Promise<boolean> {
+  if (loyaltyAvailable !== null) return loyaltyAvailable;
+  if (inFlight) return inFlight;
+
+  inFlight = (async () => {
+    // head + count asks Postgres whether the table exists without pulling
+    // a single row back.
+    const { error } = await supabase
+      .from("loyalty_rules")
+      .select("id", { head: true, count: "exact" });
+    loyaltyAvailable = !error;
+    inFlight = null;
+    return loyaltyAvailable;
+  })();
+
+  return inFlight;
+}

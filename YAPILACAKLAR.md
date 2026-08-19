@@ -8,18 +8,23 @@ yazıyor.
 
 ---
 
-## 🔴 ADIM 1 — Puan sistemini aç (2 dakika)
+## ⏸️ Puan sistemi — şimdilik KAPALI (karar verildi)
 
-**Yapmazsan:** Puan/ödül ekranı çalışmaz, rezervasyonda "puan kullan" çıkmaz.
+**Bunu çalıştırmana gerek yok.** Birlikte kapalı tutmaya karar verdik:
 
-1. https://supabase.com adresine gir, projene tıkla
-2. Sol menüden **SQL Editor** → **New query**
-3. Şu dosyanın **tamamını** kopyalayıp yapıştır:
-   `Desktop\Artic-Safari\supabase-loyalty-points-setup.sql`
-4. Sağ alttaki yeşil **Run** düğmesine bas
-5. Alt tarafta **"Success"** yazmalı
+- Tromsø tur misafiri genelde bir kez gelir; sadakat programı tekrar
+  gelmeyecek müşteriyi ödüllendirir.
+- Eşik 100 puan = 5.000 kr harcama. Tipik misafir oraya varmadan döner,
+  yani ekran "45 puanınız var" der ve o puan hiçbir şeye dönüşmez.
+- Kullanılmamış puan muhasebede borçtur; netleştirecek ödeme sistemi yok.
+- Sistem devredilecek; yeni sahibin öğreneceği her ek kavram maliyet.
 
-> Not: Bu dosyayı daha önce çalıştırmadın, ilk kez çalıştırıyorsun.
+**Kod ve SQL silinmedi.** Uygulama, tablo yoksa Ödüller sekmesini
+kendiliğinden gizliyor. Bir gün açmak istersen tek yapman gereken
+`Desktop\Artic-Safari\supabase-loyalty-points-setup.sql` dosyasını
+çalıştırmak — uygulama güncellemesi gerekmiyor, sekme kendiliğinden gelir.
+
+Taksi tarafı büyürse mantıklı olabilir: yerel müşteri tekrar biner.
 
 ---
 
