@@ -50,32 +50,6 @@ Başka bir değer çıkarsa bana söyle, SQL'i ona göre güncellerim.
 
 ---
 
-## 🟡 ADIM 2 — Puan oranını kontrol et (1 dakika)
-
-Şu an ayarlı: **%2 geri kazanım** (100 kr harcama = 2 puan, 1 puan = 1 kr)
-
-| Rezervasyon | Kazanılan puan | Değeri |
-|---|---|---|
-| 2.250 kr | 45 puan | 45 kr |
-| 5.000 kr | 100 puan | 100 kr |
-| 15.000 kr | 300 puan | 300 kr |
-
-**Karar vermen gereken tek şey:** Şu an bir misafirin puanını
-kullanabilmesi için **en az 100 puan** biriktirmesi gerekiyor — yani
-yaklaşık 5.000 kr'lık rezervasyon.
-
-Tromsø'ya gelen misafirlerin çoğu **bir kez** geldiği için bu eşik yüksek
-olabilir. İlk rezervasyonda da puanını kullanabilsinler istersen, Supabase
-SQL Editor'de şunu çalıştır:
-
-```sql
-update loyalty_rules set min_redeem_points = 50;
-```
-
-Yüksek kalsın, sadık müşteriye özel olsun diyorsan hiçbir şey yapma.
-
----
-
 ## 🟡 ADIM 3 — Google ile giriş (15 dakika)
 
 **Yapmazsan:** "Google ile devam et" düğmesi hata verir. E-posta/şifre ile
@@ -168,15 +142,14 @@ olduğunda söyle, birlikte yaparız.
 - 4 adımlı rezervasyon (tarih → ekstralar → bilgiler → onay)
 - Partner promosyon kodu
 - Rezervasyonlarım + geri sayım
-- Canlı sürücü takibi (sürücü konum göndermeye başlayınca)
+- Canlı sürücü takibi — ekranlar hazır, ama **henüz hiçbir yer şoför konumu göndermiyor**
 - Transfer fiyat hesaplama + adres arama + konumumu kullan
-- Puan/ödül ekranı
 
 **Şoför / yönetici tarafı** (aynı uygulama, giriş yapana göre değişiyor)
 - Web sitesinin admin/şoför bilgileriyle giriş → doğrudan istek kuyruğu
 - Şoför **sadece taksi** isteklerini görür
 - Yönetici **Taksi / Turlar** diye iki bölüm arasında geçiş yapar
-- Açık / Bendeki / Kapanmış filtreleri, her birinde sayı
+- Açık / Bendeki / Tümü filtreleri, her birinde sayı
 - Anlık bildirim: banner + sekmede "+1" + titreşim
 - "Bu işi al" — iki şoför aynı anda basarsa sadece biri alır
 - Haritada aç (Google Maps) — koordinat kayıtlıysa
