@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Linking, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Alert, Linking, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { EmptyState, Loader, Screen } from "../components/ui";
 import { useTranslation, formatCurrency } from "../i18n";
@@ -7,7 +7,8 @@ import { useAuth } from "../lib/useAuth";
 import { useNotifications } from "../lib/useNotifications";
 import { COLORS, RADIUS, SPACING, TYPE } from "../constants/theme";
 import { supabase } from "../lib/supabase";
-import type { Booking } from "../services/bookings";
+import type { Booking, BookingStatus } from "../services/bookings";
+import { driverActionsFor, NO_SHOW_FROM } from "../lib/lifecycle";
 
 /**
  * Staff dispatch queue.
@@ -51,6 +52,7 @@ export default function RequestsScreen({ navigation }: any) {
   const [section, setSection] = useState<Section>("taxi");
   const [filter, setFilter] = useState<Filter>("open");
   const [claiming, setClaiming] = useState<string | null>(null);
+  const [advancing, setAdvancing] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -111,6 +113,38 @@ export default function RequestsScreen({ navigation }: any) {
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     load();
+  };
+
+  /**
+   * Moves a job along. Legality lives in Postgres; this only sends the
+   * move and surfaces the refusal verbatim if the database disagrees --
+   * "Cannot move a booking from completed to in_progress" says more to a
+   * driver than "Update failed".
+   */
+  const advance = async (booking: Booking, to: BookingStatus, needsConfirm: boolean) => {
+    const run = async () => {
+      setAdvancing(booking.id);
+      setError("");
+      const { error: err } = await supabase
+        .from("bookings")
+        .update({
+          status: to,
+          // Releasing a job has to let go of the driver too, or the row
+          // sits in the queue still claimed and nobody can take it.
+          ...(to === "confirmed" ? { assigned_driver: null } : {}),
+        })
+        .eq("id", booking.id);
+      setAdvancing(null);
+      if (err) return setError(err.message);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      load();
+    };
+
+    if (!needsConfirm) return run();
+    Alert.alert(t("requests.confirmTitle"), t("requests.confirmCompleteBody"), [
+      { text: t("common.cancel"), style: "cancel" },
+      { text: t("requests.completeTrip"), style: "default", onPress: run },
+    ]);
   };
 
   const isTaxi = (b: Booking) => TAXI_TYPES.includes((b.booking_type || "").toLowerCase());
@@ -342,6 +376,46 @@ export default function RequestsScreen({ navigation }: any) {
                     ) : null}
                   </View>
 
+                  {/*
+                    The driver's own jobs get the next step. Without this
+                    the app could claim work and never finish it, and the
+                    accounting report -- which counts revenue from
+                    completed trips -- stayed empty for trips that really
+                    happened.
+                  */}
+                  {mine
+                    ? driverActionsFor(b.status).map((action) => (
+                        <Pressable
+                          key={action.to}
+                          onPress={() => advance(b, action.to, Boolean(action.confirm))}
+                          disabled={advancing === b.id}
+                          style={({ pressed }) => [
+                            action.tone === "primary" ? styles.claim : styles.stepNeutral,
+                            pressed && styles.pressed,
+                            advancing === b.id && styles.claimBusy,
+                          ]}
+                        >
+                          <Text
+                            style={
+                              action.tone === "primary" ? styles.claimText : styles.stepNeutralText
+                            }
+                          >
+                            {advancing === b.id ? t("booking.sending") : t(action.labelKey as any)}
+                          </Text>
+                        </Pressable>
+                      ))
+                    : null}
+
+                  {mine && NO_SHOW_FROM.includes(b.status) ? (
+                    <Pressable
+                      onPress={() => advance(b, "no_show", true)}
+                      disabled={advancing === b.id}
+                      style={({ pressed }) => [styles.noShow, pressed && styles.pressed]}
+                    >
+                      <Text style={styles.noShowText}>{t("requests.markNoShow")}</Text>
+                    </Pressable>
+                  ) : null}
+
                   {role === "driver" && open ? (
                     <Pressable
                       onPress={() => claim(b)}
@@ -483,6 +557,22 @@ const styles = StyleSheet.create({
   },
   claimBusy: { opacity: 0.6 },
   claimText: { fontSize: 15, fontWeight: "800", color: "#20160A", letterSpacing: 0.4 },
+
+  // Secondary step: same target size as the primary, because a cold thumb
+  // does not aim well and "release this job" must not be a tiny link.
+  stepNeutral: {
+    minHeight: 50,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: SPACING.sm,
+  },
+  stepNeutralText: { ...TYPE.bodyStrong, color: COLORS.textSecondary },
+
+  noShow: { minHeight: 38, alignItems: "center", justifyContent: "center", marginTop: SPACING.xs },
+  noShowText: { ...TYPE.caption, color: COLORS.danger, fontWeight: "600" },
 
   pressed: { opacity: 0.7 },
 });
